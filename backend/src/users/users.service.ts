@@ -109,6 +109,37 @@ export class UsersService {
     return updatedUser;
   }
 
+  async approveUser(id: string, isApproved = true): Promise<UserDocument> {
+    const user = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { $set: { isApproved } },
+        { new: true },
+      )
+      .select('-password')
+      .exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user;
+  }
+
+  async toggleActive(id: string): Promise<UserDocument> {
+    const existing = await this.findById(id);
+    const updated = await this.userModel
+      .findByIdAndUpdate(
+        id,
+        { $set: { isActive: !existing.isActive } },
+        { new: true },
+      )
+      .select('-password')
+      .exec();
+
+    return updated!;
+  }
+
   async remove(id: string): Promise<void> {
     const result = await this.userModel.findByIdAndDelete(id).exec();
     if (!result) {

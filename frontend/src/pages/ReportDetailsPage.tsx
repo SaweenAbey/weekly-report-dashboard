@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { reportsApi } from '../api/reports.api';
 import { Report } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -107,9 +108,10 @@ export const ReportDetailsPage: React.FC = () => {
   const handleSubmit = async () => {
     try {
       await reportsApi.submit(report._id);
+      toast.success('Report submitted for manager review!');
       fetchReport();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to submit report');
+      toast.error(err.response?.data?.message || 'Failed to submit report');
     }
   };
 
@@ -117,9 +119,10 @@ export const ReportDetailsPage: React.FC = () => {
     if (confirm('Are you sure you want to delete this report?')) {
       try {
         await reportsApi.delete(report._id);
+        toast.success('Report deleted successfully');
         navigate('/reports');
       } catch (err: any) {
-        alert(err.response?.data?.message || 'Failed to delete report');
+        toast.error(err.response?.data?.message || 'Failed to delete report');
       }
     }
   };

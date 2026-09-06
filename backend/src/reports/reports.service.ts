@@ -16,6 +16,8 @@ import { UserDocument } from '../users/schemas/user.schema';
 import { Project, ProjectDocument } from '../projects/schemas/project.schema';
 import { Role } from '../common/enums/role.enum';
 import { ReportStatus } from '../common/enums/report-status.enum';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
+import { ActivityAction } from '../activity-logs/schemas/activity-log.schema';
 
 @Injectable()
 export class ReportsService {
@@ -24,6 +26,7 @@ export class ReportsService {
     private readonly reportModel: Model<ReportDocument>,
     @InjectModel(Project.name)
     private readonly projectModel: Model<ProjectDocument>,
+    private readonly activityLogsService: ActivityLogsService,
   ) {}
 
   async create(
@@ -44,7 +47,15 @@ export class ReportsService {
       latestComment: '',
     });
 
-    return (await createdReport.save()).populate([
+    const savedReport = await createdReport.save();
+    await this.activityLogsService.log({
+      user: currentUser._id.toString(),
+      action: ActivityAction.REPORT_CREATED,
+      description: `Draft report created for project ${project.name} (Week of ${new Date(createReportDto.weekStartDate).toLocaleDateString()})`,
+      metadata: { reportId: savedReport._id, projectId: project._id },
+    });
+
+    return savedReport.populate([
       { path: 'author', select: 'name email avatarUrl department' },
       { path: 'project', select: 'name key manager' },
     ]);
@@ -248,7 +259,16 @@ export class ReportsService {
     }
 
     report.status = ReportStatus.SUBMITTED;
-    return report.save();
+    const saved = await report.save();
+
+    await this.activityLogsService.log({
+      user: currentUser._id.toString(),
+      action: ActivityAction.REPORT_SUBMITTED,
+      description: `Weekly report submitted for manager review by ${currentUser.name}`,
+      metadata: { reportId: report._id },
+    });
+
+    return saved;
   }
 
   async reviewReport(
@@ -292,6 +312,13 @@ export class ReportsService {
     report.reviewHistory.push(historyEntry as any);
 
     await report.save();
+
+    await this.activityLogsService.log({
+      user: currentUser._id.toString(),
+      action: ActivityAction.REPORT_REVIEWED,
+      description: `Report reviewed by ${currentUser.name}: ${reviewReportDto.status} ("${reviewReportDto.comment.substring(0, 50)}...")`,
+      metadata: { reportId: report._id, decision: reviewReportDto.status },
+    });
 
     return this.findById(id, currentUser);
   }

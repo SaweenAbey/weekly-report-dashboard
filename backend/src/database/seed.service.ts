@@ -40,6 +40,7 @@ export class SeedService {
       department: 'Executive Operations',
       avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=admin',
       isActive: true,
+      isApproved: true,
     });
 
     const managerSarah = await this.userModel.create({
@@ -50,6 +51,7 @@ export class SeedService {
       department: 'Core Product Engineering',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarah',
       isActive: true,
+      isApproved: true,
     });
 
     const managerAlex = await this.userModel.create({
@@ -60,6 +62,7 @@ export class SeedService {
       department: 'Platform & Infrastructure',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alex',
       isActive: true,
+      isApproved: true,
     });
 
     const devJohn = await this.userModel.create({
@@ -70,6 +73,7 @@ export class SeedService {
       department: 'Core Product Engineering',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=john',
       isActive: true,
+      isApproved: true,
     });
 
     const devEmma = await this.userModel.create({
@@ -80,6 +84,7 @@ export class SeedService {
       department: 'Core Product Engineering',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma',
       isActive: true,
+      isApproved: true,
     });
 
     const devDavid = await this.userModel.create({
@@ -90,6 +95,7 @@ export class SeedService {
       department: 'Platform & Infrastructure',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=david',
       isActive: true,
+      isApproved: true,
     });
 
     this.logger.log('👥 Users seeded successfully');

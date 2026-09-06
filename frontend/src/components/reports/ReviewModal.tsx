@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import toast from 'react-hot-toast';
 import { reportsApi } from '../../api/reports.api';
 import { Report, ReportStatus } from '../../types';
 import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
@@ -28,7 +29,9 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) {
-      setError('Please provide feedback comments for the author.');
+      const msg = 'Please provide feedback comments for the author.';
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -40,13 +43,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         status,
         comment: comment.trim(),
       });
+      toast.success(`Report review submitted: ${status}!`);
       onReviewed(updated);
       onClose();
       setComment('');
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Failed to submit review. Please try again.',
-      );
+      const msg = err.response?.data?.message || 'Failed to submit review.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

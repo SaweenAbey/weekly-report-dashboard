@@ -22,6 +22,16 @@ export const usersApi = {
     return res.data || res;
   },
 
+  approve: async (id: string): Promise<User> => {
+    const res: any = await apiClient.patch(`/users/${id}/approve`);
+    return res.data || res;
+  },
+
+  toggleActive: async (id: string): Promise<User> => {
+    const res: any = await apiClient.patch(`/users/${id}/toggle-active`);
+    return res.data || res;
+  },
+
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/users/${id}`);
   },

@@ -11,8 +11,14 @@ interface AuthContextType {
   isManager: boolean;
   isTeamMember: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { name: string; email: string; password: string; role?: Role; department?: string }) => Promise<void>;
-  logout: () => void;
+  register: (data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: Role;
+    department?: string;
+  }) => Promise<{ message: string; isApproved: boolean }>;
+  logout: () => Promise<void>;
   quickLogin: (role: 'admin' | 'manager' | 'member') => Promise<void>;
 }
 
@@ -54,22 +60,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (data: { name: string; email: string; password: string; role?: Role; department?: string }) => {
+  const register = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: Role;
+    department?: string;
+  }): Promise<{ message: string; isApproved: boolean }> => {
     setIsLoading(true);
     try {
       const res = await authApi.register(data);
-      localStorage.setItem('access_token', res.accessToken);
-      setToken(res.accessToken);
-      setUser(res.user as any);
+      return {
+        message: res.message,
+        isApproved: res.isApproved,
+      };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('access_token');
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      await authApi.logout();
+    } catch {
+      // ignore network/auth errors during logout
+    } finally {
+      localStorage.removeItem('access_token');
+      setToken(null);
+      setUser(null);
+    }
   };
 
   const quickLogin = async (role: 'admin' | 'manager' | 'member') => {
