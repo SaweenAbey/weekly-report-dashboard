@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { RoleBadge } from '../components/common/StatusBadge';
 import { Spinner } from '../components/common/Modal';
 import { Button } from '../components/common/Button';
+import { UserAvatar } from '../components/common/UserAvatar';
 import {
   Mail,
   Building,
@@ -47,6 +48,22 @@ export const TeamPage: React.FC = () => {
       fetchUsers();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to approve user');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleReject = async (userId: string, userName: string) => {
+    if (!window.confirm(`Are you sure you want to reject and remove registration request for ${userName}?`)) {
+      return;
+    }
+    setActionLoading(userId);
+    try {
+      await usersApi.delete(userId);
+      toast.success(`Registration request for ${userName} has been rejected.`);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to reject user');
     } finally {
       setActionLoading(null);
     }
@@ -151,14 +168,7 @@ export const TeamPage: React.FC = () => {
                 className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-300 hover:shadow-md transition-all space-y-4"
               >
                 <div className="flex items-start space-x-3.5">
-                  <img
-                    src={
-                      member.avatarUrl ||
-                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${member.name}`
-                    }
-                    alt={member.name}
-                    className="h-12 w-12 rounded-2xl bg-slate-100 border border-slate-200 object-cover flex-shrink-0"
-                  />
+                  <UserAvatar name={member.name} size="lg" />
                   <div className="min-w-0 flex-1 space-y-1">
                     <div className="flex items-center justify-between gap-1">
                       <h3 className="text-sm font-bold text-slate-900 truncate">
@@ -201,15 +211,26 @@ export const TeamPage: React.FC = () => {
                   {isAdmin && (
                     <div className="flex items-center gap-2">
                       {!isApproved ? (
-                        <Button
-                          size="sm"
-                          variant="success"
-                          isLoading={actionLoading === memberId}
-                          onClick={() => handleApprove(memberId, member.name)}
-                          icon={<UserCheck className="h-3.5 w-3.5" />}
-                        >
-                          Approve
-                        </Button>
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="success"
+                            isLoading={actionLoading === memberId}
+                            onClick={() => handleApprove(memberId, member.name)}
+                            icon={<UserCheck className="h-3.5 w-3.5" />}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            isLoading={actionLoading === memberId}
+                            onClick={() => handleReject(memberId, member.name)}
+                            icon={<UserX className="h-3.5 w-3.5" />}
+                          >
+                            Reject
+                          </Button>
+                        </div>
                       ) : (
                         <Button
                           size="sm"
