@@ -6,6 +6,7 @@ import { Project, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { Spinner, Modal } from '../components/common/Modal';
 import { Button } from '../components/common/Button';
+import { UserAvatar } from '../components/common/UserAvatar';
 import {
   FolderKanban,
   Plus,
@@ -130,10 +131,6 @@ export const ProjectsPage: React.FC = () => {
               typeof project.manager === 'object'
                 ? (project.manager as User).name
                 : 'Assigned Manager';
-            const managerAvatar =
-              typeof project.manager === 'object'
-                ? (project.manager as User).avatarUrl
-                : undefined;
 
             return (
               <div
@@ -165,14 +162,7 @@ export const ProjectsPage: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400 font-medium">Lead Manager:</span>
                     <div className="flex items-center gap-1.5 font-semibold text-slate-800">
-                      <img
-                        src={
-                          managerAvatar ||
-                          `https://api.dicebear.com/7.x/avataaars/svg?seed=${managerName}`
-                        }
-                        alt={managerName}
-                        className="h-5 w-5 rounded-full object-cover bg-slate-100"
-                      />
+                      <UserAvatar name={managerName} size="xs" rounded="full" />
                       <span>{managerName}</span>
                     </div>
                   </div>

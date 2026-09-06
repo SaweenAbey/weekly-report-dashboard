@@ -9,6 +9,7 @@ import { ReviewModal } from '../components/reports/ReviewModal';
 import { CreateReportModal } from '../components/reports/CreateReportModal';
 import { Spinner } from '../components/common/Modal';
 import { Button } from '../components/common/Button';
+import { UserAvatar } from '../components/common/UserAvatar';
 import { useAuth } from '../context/AuthContext';
 import {
   ArrowLeft,
@@ -101,9 +102,6 @@ export const ReportDetailsPage: React.FC = () => {
     typeof report.project === 'object' ? report.project.key : 'PRJ';
 
   const authorName = report.author?.name || 'Unknown Author';
-  const authorAvatar =
-    report.author?.avatarUrl ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${authorName}`;
 
   const handleSubmit = async () => {
     try {
@@ -190,11 +188,7 @@ export const ReportDetailsPage: React.FC = () => {
         {/* Header Information */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-slate-100 pb-6">
           <div className="flex items-center space-x-4">
-            <img
-              src={authorAvatar}
-              alt={authorName}
-              className="h-14 w-14 rounded-2xl bg-slate-100 border border-slate-200 object-cover shadow-sm"
-            />
+            <UserAvatar name={authorName} size="xl" />
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold text-slate-900">{authorName}</h1>
