@@ -18,17 +18,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/80 px-4 sm:px-6 lg:px-8 backdrop-blur-md">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Mobile menu trigger */}
         <button
           onClick={onOpenSidebar}
-          className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 lg:hidden focus:outline-none"
+          aria-label="Open navigation sidebar"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100/80 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 lg:hidden border border-slate-200 transition focus:outline-none shadow-sm"
+          title="Toggle Navigation Menu"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-5 w-5" />
         </button>
 
         <div>
-          <h1 className="text-lg font-bold text-slate-900 tracking-tight">
+          <h1 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">
             Weekly Report Dashboard
           </h1>
           <p className="hidden sm:block text-xs text-slate-500">

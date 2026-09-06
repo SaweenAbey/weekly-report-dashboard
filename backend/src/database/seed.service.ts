@@ -19,7 +19,7 @@ export class SeedService {
   ) {}
 
   async seed() {
-    this.logger.log('🌱 Starting database seed...');
+    this.logger.log('🌱 Starting comprehensive database seed...');
 
     // Clear existing data
     await this.reportModel.deleteMany({});
@@ -81,7 +81,7 @@ export class SeedService {
       email: 'emma.dev@example.com',
       password: defaultPassword,
       role: Role.TEAM_MEMBER,
-      department: 'Core Product Engineering',
+      department: 'Frontend Engineering',
       avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma',
       isActive: true,
       isApproved: true,
@@ -98,151 +98,381 @@ export class SeedService {
       isApproved: true,
     });
 
+    const devLisa = await this.userModel.create({
+      name: 'Lisa Chen',
+      email: 'lisa.dev@example.com',
+      password: defaultPassword,
+      role: Role.TEAM_MEMBER,
+      department: 'QA & Automation',
+      avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=lisa',
+      isActive: true,
+      isApproved: true,
+    });
+
     this.logger.log('👥 Users seeded successfully');
 
     // 2. Create Projects
-    const projectWeeklyDashboard = await this.projectModel.create({
+    const projectWRD = await this.projectModel.create({
       name: 'Weekly Report Dashboard 2.0',
       key: 'WRD',
-      description: 'Modern enterprise dashboard for weekly engineering report submissions and reviews.',
+      description: 'Modern enterprise dashboard for weekly engineering report submissions, compliance tracking, and review workflows.',
       manager: managerSarah._id,
-      members: [devJohn._id, devEmma._id],
+      members: [devJohn._id, devEmma._id, devLisa._id],
       status: ProjectStatus.ACTIVE,
       startDate: new Date('2026-01-10'),
       endDate: new Date('2026-12-31'),
     });
 
-    const projectCloudMigration = await this.projectModel.create({
+    const projectCIM = await this.projectModel.create({
       name: 'Cloud Infrastructure Modernization',
       key: 'CIM',
-      description: 'Migrating legacy monolith servers to containerized microservices and automated CI/CD.',
+      description: 'Migrating legacy monolith servers to containerized microservices and automated CI/CD pipeline orchestration.',
       manager: managerAlex._id,
-      members: [devDavid._id],
+      members: [devDavid._id, devJohn._id],
       status: ProjectStatus.ACTIVE,
       startDate: new Date('2026-02-01'),
       endDate: new Date('2026-08-30'),
     });
 
+    const projectAIX = await this.projectModel.create({
+      name: 'AI Insights & Automation Hub',
+      key: 'AIX',
+      description: 'Automated executive summary generation and delivery risk predictions for engineering initiatives.',
+      manager: managerSarah._id,
+      members: [devEmma._id, devLisa._id],
+      status: ProjectStatus.ACTIVE,
+      startDate: new Date('2026-03-01'),
+      endDate: new Date('2026-11-30'),
+    });
+
     this.logger.log('📁 Projects seeded successfully');
 
-    // 3. Create Sample Reports with Review History
-    // Report 1: Approved report for John
+    // 3. Create Multi-Week Reports with Standardized Format
+
+    // --- Week 34 (Approved) - John Developer ---
     await this.reportModel.create({
       author: devJohn._id,
-      project: projectWeeklyDashboard._id,
-      weekStartDate: new Date('2026-08-25'),
-      weekEndDate: new Date('2026-08-31'),
-      summary: 'Completed JWT authentication integration, role guards, and MongoDB schema design.',
-      tasksCompleted: [
-        'Configured NestJS passport-jwt strategy and RolesGuard',
-        'Implemented Mongoose schemas for User, Project, and Report',
-        'Added pagination and filtering DTOs with class-validator',
-      ],
-      tasksInProgress: ['Building REST endpoints for report approval workflow'],
-      plansForNextWeek: [
-        'Complete Swagger API documentation',
-        'Connect frontend dashboard UI to backend API',
-      ],
-      blockers: 'None',
-      hoursLogged: 40,
-      status: ReportStatus.APPROVED,
-      latestComment: 'Excellent work on the architecture and clean security guards! Approved.',
-      reviewHistory: [
+      project: projectWRD._id,
+      weekStartDate: new Date('2026-08-18'),
+      weekEndDate: new Date('2026-08-24'),
+      summary: 'Completed backend security architecture, JWT authentication with refresh token strategy, and role authorization guards.',
+      tasks: [
         {
-          reviewer: managerSarah._id,
-          status: ReportStatus.UNDER_REVIEW,
-          comment: 'Started reviewing report submissions for Week 35.',
-          reviewedAt: new Date('2026-09-01T09:30:00Z'),
+          taskName: 'Implement Passport JWT Strategy & Guard',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 12,
+          actualHours: 12,
+          outputDeliverable: 'PR #12 - JWT authentication module',
         },
+        {
+          taskName: 'Role-Based Access Control Guards',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 10,
+          actualHours: 10,
+          outputDeliverable: 'RolesGuard with execution context reflector',
+        },
+        {
+          taskName: 'Mongoose Entity Schemas Setup',
+          priority: 'MEDIUM',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 8,
+          actualHours: 9,
+          outputDeliverable: 'User, Project, and Report schemas',
+        },
+      ],
+      plansForNextWeek: [
+        'Build report review workflow endpoints',
+        'Add activity log audit interceptors',
+      ],
+      blockersList: [
+        {
+          description: 'MongoDB Atlas network whitelist latency during peak test runs',
+          isKeyIssue: false,
+        },
+      ],
+      achievementsList: [
+        {
+          description: 'Achieved 100% test coverage on authentication security guards',
+          isKeyAchievement: true,
+        },
+      ],
+      hoursBreakdown: {
+        development: 26,
+        testing: 8,
+        meetings: 4,
+        documentation: 3,
+        other: 0,
+      },
+      hoursLogged: 41,
+      notesOrLinks: 'https://github.com/org/repo/pull/12',
+      status: ReportStatus.APPROVED,
+      latestComment: 'Excellent architecture and clean guards! Approved without changes.',
+      reviewHistory: [
         {
           reviewer: managerSarah._id,
           status: ReportStatus.APPROVED,
-          comment: 'Excellent work on the architecture and clean security guards! Approved.',
-          reviewedAt: new Date('2026-09-01T14:15:00Z'),
+          comment: 'Excellent architecture and clean guards! Approved without changes.',
+          reviewedAt: new Date('2026-08-25T14:30:00Z'),
         },
       ],
+      versionHistory: [],
     });
 
-    // Report 2: Changes Requested for Emma
+    // --- Week 35 (Approved) - Emma Watson ---
     await this.reportModel.create({
       author: devEmma._id,
-      project: projectWeeklyDashboard._id,
+      project: projectWRD._id,
       weekStartDate: new Date('2026-08-25'),
       weekEndDate: new Date('2026-08-31'),
-      summary: 'Worked on dashboard analytics UI mockups and chart components.',
-      tasksCompleted: [
-        'Designed high-fidelity mockups for status timeline',
-        'Created responsive sidebar and navbar components',
+      summary: 'Designed and built high-performance responsive frontend layout with Tailwind CSS and glassmorphism styling.',
+      tasks: [
+        {
+          taskName: 'Executive Dashboard KPI Layout',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 14,
+          actualHours: 14,
+          outputDeliverable: 'Interactive KPI summary cards and responsive grid',
+        },
+        {
+          taskName: 'Visual Velocity & Donut Charts',
+          priority: 'MEDIUM',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 12,
+          actualHours: 14,
+          outputDeliverable: 'Custom zero-dependency SVG charts',
+        },
       ],
-      tasksInProgress: ['Integrating Chart.js for review turnaround metrics'],
       plansForNextWeek: [
-        'Refine color palette with glassmorphism design tokens',
-        'Add export to PDF functionality',
+        'Implement standardized report creator form with validation',
+        'Add user profile and member history pages',
       ],
-      blockers: 'Waiting for approved color palette guidelines from design team.',
-      hoursLogged: 36.5,
-      status: ReportStatus.CHANGES_REQUESTED,
-      latestComment: 'Please specify the exact hours logged per task item before resubmitting.',
+      blockersList: [],
+      achievementsList: [
+        {
+          description: 'Zero external chart dependency payload with blazing fast SVG render performance',
+          isKeyAchievement: true,
+        },
+      ],
+      hoursBreakdown: {
+        development: 28,
+        testing: 6,
+        meetings: 3,
+        documentation: 2,
+        other: 0,
+      },
+      hoursLogged: 39,
+      status: ReportStatus.APPROVED,
+      latestComment: 'Stunning visual aesthetics and very responsive layout. Approved!',
       reviewHistory: [
         {
           reviewer: managerSarah._id,
+          status: ReportStatus.APPROVED,
+          comment: 'Stunning visual aesthetics and very responsive layout. Approved!',
+          reviewedAt: new Date('2026-09-01T10:00:00Z'),
+        },
+      ],
+      versionHistory: [],
+    });
+
+    // --- Week 35 (Changes Requested with Version History) - David Kim ---
+    await this.reportModel.create({
+      author: devDavid._id,
+      project: projectCIM._id,
+      weekStartDate: new Date('2026-08-25'),
+      weekEndDate: new Date('2026-08-31'),
+      summary: 'Prepared staging Kubernetes cluster manifests and containerized Docker images.',
+      tasks: [
+        {
+          taskName: 'Kubernetes Ingress & TLS Secret Setup',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 75,
+          status: 'IN_PROGRESS',
+          plannedHours: 15,
+          actualHours: 18,
+          outputDeliverable: 'Ingress routing yaml config',
+        },
+        {
+          taskName: 'Dockerfile Multi-Stage Optimization',
+          priority: 'MEDIUM',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 8,
+          actualHours: 8,
+          outputDeliverable: 'Reduced image size by 65%',
+        },
+      ],
+      plansForNextWeek: [
+        'Complete DNS propagation and SSL automation',
+        'Run load tests with k6 on staging cluster',
+      ],
+      blockersList: [
+        {
+          description: 'Awaiting AWS cloud quota increase approval from DevOps Lead',
+          isKeyIssue: true,
+        },
+      ],
+      achievementsList: [
+        {
+          description: 'Reduced Docker build duration by 4 minutes with multi-stage caching',
+          isKeyAchievement: true,
+        },
+      ],
+      hoursBreakdown: {
+        development: 22,
+        testing: 8,
+        meetings: 5,
+        documentation: 3,
+        other: 2,
+      },
+      hoursLogged: 40,
+      status: ReportStatus.CHANGES_REQUESTED,
+      latestComment: 'Please break down the ingress blocker and specify the ETA for the TLS certificate resolution.',
+      reviewHistory: [
+        {
+          reviewer: managerAlex._id,
           status: ReportStatus.CHANGES_REQUESTED,
-          comment: 'Please specify the exact hours logged per task item before resubmitting.',
-          reviewedAt: new Date('2026-09-02T11:00:00Z'),
+          comment: 'Please break down the ingress blocker and specify the ETA for the TLS certificate resolution.',
+          reviewedAt: new Date('2026-09-02T11:15:00Z'),
+        },
+      ],
+      versionHistory: [
+        {
+          versionNumber: 1,
+          submittedAt: new Date('2026-08-31T18:00:00Z'),
+          snapshot: {
+            summary: 'Initial draft of staging Kubernetes cluster deployment.',
+            hoursLogged: 36,
+          },
+          reviewComment: 'Please break down the ingress blocker and specify the ETA for the TLS certificate resolution.',
+          reviewStatus: 'CHANGES_REQUESTED',
+          reviewerName: 'Alex Rivera (Manager)',
         },
       ],
     });
 
-    // Report 3: Submitted report for David (Cloud Migration)
+    // --- Week 36 (Submitted / Under Review) - Lisa Chen ---
     await this.reportModel.create({
-      author: devDavid._id,
-      project: projectCloudMigration._id,
+      author: devLisa._id,
+      project: projectWRD._id,
       weekStartDate: new Date('2026-09-01'),
       weekEndDate: new Date('2026-09-07'),
-      summary: 'Configured Docker Compose setup and prepared Kubernetes manifests for staging cluster.',
-      tasksCompleted: [
-        'Drafted Dockerfile multi-stage builds for NestJS and MongoDB',
-        'Set up GitHub Actions workflow for automated unit tests and linting',
+      summary: 'Executed comprehensive end-to-end testing across report submission, review cycle, and audit trail logs.',
+      tasks: [
+        {
+          taskName: 'Cypress E2E Test Suite for Report Approval Flow',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 16,
+          actualHours: 15,
+          outputDeliverable: '14 automated test suites passing in CI',
+        },
+        {
+          taskName: 'Role Guard Permission Verification Matrix',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 100,
+          status: 'COMPLETED',
+          plannedHours: 10,
+          actualHours: 11,
+          outputDeliverable: 'Automated RBAC test coverage suite',
+        },
       ],
-      tasksInProgress: ['Configuring ingress controller with SSL certificates'],
-      plansForNextWeek: ['Deploy staging environment and run performance stress tests'],
-      blockers: 'Awaiting cloud quota increase approval from AWS operations.',
-      hoursLogged: 39,
+      plansForNextWeek: [
+        'Set up automated accessibility compliance checking (a11y)',
+        'Create performance test benchmarks for dashboard chart rendering',
+      ],
+      blockersList: [
+        {
+          description: 'Intermittent rate-limiting in test sandbox environment',
+          isKeyIssue: false,
+        },
+      ],
+      achievementsList: [
+        {
+          description: 'Zero regressions detected across all 8+ core pages in sprint release',
+          isKeyAchievement: true,
+        },
+      ],
+      hoursBreakdown: {
+        development: 12,
+        testing: 20,
+        meetings: 4,
+        documentation: 4,
+        other: 0,
+      },
+      hoursLogged: 40,
       status: ReportStatus.SUBMITTED,
       latestComment: '',
       reviewHistory: [],
+      versionHistory: [],
     });
 
-    // Report 4: Draft report for John (Current Week)
+    // --- Week 36 (Draft) - John Developer ---
     await this.reportModel.create({
       author: devJohn._id,
-      project: projectWeeklyDashboard._id,
+      project: projectAIX._id,
       weekStartDate: new Date('2026-09-01'),
       weekEndDate: new Date('2026-09-07'),
-      summary: 'Finalizing backend REST controllers and preparing documentation.',
-      tasksCompleted: [
-        'Added global exception filter and response interceptor',
-        'Implemented seed runner script',
+      summary: 'Drafting AI summary generation prompt pipelines and executive aggregation models.',
+      tasks: [
+        {
+          taskName: 'LangChain Summarization Workflow Spike',
+          priority: 'HIGH',
+          plannedPercent: 100,
+          actualPercent: 50,
+          status: 'IN_PROGRESS',
+          plannedHours: 12,
+          actualHours: 6,
+          outputDeliverable: 'Prototype endpoint for weekly executive digests',
+        },
       ],
-      tasksInProgress: ['Writing API integration tests'],
-      plansForNextWeek: ['Support frontend team during dashboard integration'],
-      blockers: 'None',
-      hoursLogged: 24,
+      plansForNextWeek: [
+        'Connect AI summary trigger to weekly manager review email alerts',
+      ],
+      blockersList: [],
+      achievementsList: [],
+      hoursBreakdown: {
+        development: 14,
+        testing: 4,
+        meetings: 3,
+        documentation: 2,
+        other: 0,
+      },
+      hoursLogged: 23,
       status: ReportStatus.DRAFT,
       latestComment: '',
       reviewHistory: [],
+      versionHistory: [],
     });
 
-    this.logger.log('📊 Sample Reports seeded successfully');
-    this.logger.log('✅ Database seeding finished!');
+    this.logger.log('📊 Multi-week reports with standardized tables and snapshots seeded');
+    this.logger.log('✅ Database seeding complete!');
     this.logger.log('---------------------------------------------------------');
-    this.logger.log('Default Seed Users:');
+    this.logger.log('Default Seed Accounts:');
     this.logger.log('🔑 Admin: admin@example.com / Password123!');
     this.logger.log('🔑 Manager 1: sarah.manager@example.com / Password123!');
     this.logger.log('🔑 Manager 2: alex.manager@example.com / Password123!');
-    this.logger.log('🔑 Member 1: john.dev@example.com / Password123!');
-    this.logger.log('🔑 Member 2: emma.dev@example.com / Password123!');
-    this.logger.log('🔑 Member 3: david.dev@example.com / Password123!');
+    this.logger.log('🔑 Team Member 1: john.dev@example.com / Password123!');
+    this.logger.log('🔑 Team Member 2: emma.dev@example.com / Password123!');
+    this.logger.log('🔑 Team Member 3: david.dev@example.com / Password123!');
+    this.logger.log('🔑 Team Member 4: lisa.dev@example.com / Password123!');
     this.logger.log('---------------------------------------------------------');
   }
 }

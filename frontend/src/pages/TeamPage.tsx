@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { usersApi } from '../api/users.api';
 import { User } from '../types';
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const TeamPage: React.FC = () => {
+  const navigate = useNavigate();
   const { isAdmin } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,49 +209,60 @@ export const TeamPage: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Admin action buttons */}
-                  {isAdmin && (
-                    <div className="flex items-center gap-2">
-                      {!isApproved ? (
-                        <div className="flex items-center gap-1.5">
+                  {/* Actions row */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => navigate(`/team/${memberId}`)}
+                      className="text-xs"
+                    >
+                      View Profile
+                    </Button>
+
+                    {isAdmin && (
+                      <>
+                        {!isApproved ? (
+                          <div className="flex items-center gap-1.5">
+                            <Button
+                              size="sm"
+                              variant="success"
+                              isLoading={actionLoading === memberId}
+                              onClick={() => handleApprove(memberId, member.name)}
+                              icon={<UserCheck className="h-3.5 w-3.5" />}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              isLoading={actionLoading === memberId}
+                              onClick={() => handleReject(memberId, member.name)}
+                              icon={<UserX className="h-3.5 w-3.5" />}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        ) : (
                           <Button
                             size="sm"
-                            variant="success"
+                            variant={isActive ? 'outline' : 'secondary'}
                             isLoading={actionLoading === memberId}
-                            onClick={() => handleApprove(memberId, member.name)}
-                            icon={<UserCheck className="h-3.5 w-3.5" />}
+                            onClick={() => handleToggleActive(memberId, isActive)}
+                            icon={
+                              isActive ? (
+                                <UserX className="h-3.5 w-3.5 text-rose-500" />
+                              ) : (
+                                <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
+                              )
+                            }
                           >
-                            Approve
+                            {isActive ? 'Deactivate' : 'Activate'}
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            isLoading={actionLoading === memberId}
-                            onClick={() => handleReject(memberId, member.name)}
-                            icon={<UserX className="h-3.5 w-3.5" />}
-                          >
-                            Reject
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          size="sm"
-                          variant={isActive ? 'outline' : 'secondary'}
-                          isLoading={actionLoading === memberId}
-                          onClick={() => handleToggleActive(memberId, isActive)}
-                          icon={
-                            isActive ? (
-                              <UserX className="h-3.5 w-3.5 text-rose-500" />
-                            ) : (
-                              <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
-                            )
-                          }
-                        >
-                          {isActive ? 'Deactivate' : 'Activate'}
-                        </Button>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );

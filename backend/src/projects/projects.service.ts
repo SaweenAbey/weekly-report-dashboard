@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Project, ProjectDocument } from './schemas/project.schema';
@@ -16,7 +16,25 @@ export class ProjectsService {
   ) {}
 
   async create(createProjectDto: CreateProjectDto): Promise<ProjectDocument> {
-    const createdProject = new this.projectModel(createProjectDto);
+    const existing = await this.projectModel.findOne({
+      key: createProjectDto.key.toUpperCase(),
+    });
+    if (existing) {
+      throw new BadRequestException(
+        `A project with key "${createProjectDto.key.toUpperCase()}" already exists.`,
+      );
+    }
+
+    if (createProjectDto.startDate && createProjectDto.endDate) {
+      if (new Date(createProjectDto.endDate) < new Date(createProjectDto.startDate)) {
+        throw new BadRequestException('End date cannot be earlier than start date.');
+      }
+    }
+
+    const createdProject = new this.projectModel({
+      ...createProjectDto,
+      key: createProjectDto.key.toUpperCase(),
+    });
     return (await createdProject.save()).populate(['manager', 'members']);
   }
 
