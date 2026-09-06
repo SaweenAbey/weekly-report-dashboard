@@ -1,5 +1,18 @@
 import { apiClient } from './client';
-import { PaginatedResult, Report, ReportQueryParams, ReportStatus } from '../types';
+import {
+  DashboardAnalytics,
+  PaginatedResult,
+  Report,
+  ReportQueryParams,
+  ReportStatus,
+  Project,
+  User,
+} from '../types';
+
+export type ReportPayload = Partial<Omit<Report, 'project' | 'author'>> & {
+  project?: string | Project;
+  author?: string | User;
+};
 
 export const reportsApi = {
   getAll: async (params?: ReportQueryParams): Promise<PaginatedResult<Report>> => {
@@ -12,34 +25,19 @@ export const reportsApi = {
     return res.data || res;
   },
 
-  create: async (data: {
-    project: string;
-    weekStartDate: string;
-    weekEndDate: string;
-    summary: string;
-    tasksCompleted?: string[];
-    tasksInProgress?: string[];
-    plansForNextWeek?: string[];
-    blockers?: string;
-    hoursLogged?: number;
-  }): Promise<Report> => {
+  getAnalytics: async (): Promise<DashboardAnalytics> => {
+    const res: any = await apiClient.get('/reports/analytics/dashboard');
+    return res.data || res;
+  },
+
+  create: async (data: ReportPayload): Promise<Report> => {
     const res: any = await apiClient.post('/reports', data);
     return res.data || res;
   },
 
   update: async (
     id: string,
-    data: Partial<{
-      project: string;
-      weekStartDate: string;
-      weekEndDate: string;
-      summary: string;
-      tasksCompleted: string[];
-      tasksInProgress: string[];
-      plansForNextWeek: string[];
-      blockers: string;
-      hoursLogged: number;
-    }>,
+    data: ReportPayload,
   ): Promise<Report> => {
     const res: any = await apiClient.patch(`/reports/${id}`, data);
     return res.data || res;

@@ -44,6 +44,12 @@ export class ReportsController {
     return this.reportsService.findAll(queryDto, currentUser);
   }
 
+  @Get('analytics/dashboard')
+  @Roles(Role.ADMIN, Role.MANAGER, Role.TEAM_MEMBER)
+  getAnalytics(@CurrentUser() currentUser: UserDocument) {
+    return this.reportsService.getDashboardAnalytics(currentUser);
+  }
+
   @Get(':id')
   findOne(
     @Param('id') id: string,

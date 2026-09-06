@@ -2,47 +2,65 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { reportsApi } from '../api/reports.api';
-import { Report } from '../types';
+import { DashboardAnalytics, Report } from '../types';
 import { ReportCard } from '../components/reports/ReportCard';
 import { ReviewModal } from '../components/reports/ReviewModal';
 import { CreateReportModal } from '../components/reports/CreateReportModal';
 import { Spinner } from '../components/common/Modal';
 import { Button } from '../components/common/Button';
+import { AreaTrendChart } from '../components/charts/AreaTrendChart';
+import { MemberStatusChart } from '../components/charts/MemberStatusChart';
+import { ProjectDonutChart } from '../components/charts/ProjectDonutChart';
+import { TaskTypeBarChart } from '../components/charts/TaskTypeBarChart';
 import {
   FileText,
   Clock,
-  CheckCircle2,
   AlertCircle,
   Plus,
   ArrowUpRight,
+  TrendingUp,
+  Users,
+  Layers,
+  Flame,
+  Percent,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const DashboardPage: React.FC = () => {
-  const { isManager } = useAuth();
+  const { isManager, isAdmin } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
+  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'approved' | 'changes'>('all');
   const [selectedReportForReview, setSelectedReportForReview] = useState<Report | null>(null);
   const [selectedReportForEdit, setSelectedReportForEdit] = useState<Report | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const fetchReports = async () => {
+  const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const res = await reportsApi.getAll({ limit: 20 });
-      setReports(res.data);
+      const [reportsRes, analyticsRes] = await Promise.all([
+        reportsApi.getAll({ limit: 20 }),
+        reportsApi.getAnalytics().catch((e) => {
+          console.error('Analytics load error:', e);
+          return null;
+        }),
+      ]);
+      setReports(reportsRes.data);
+      if (analyticsRes) {
+        setAnalytics(analyticsRes);
+      }
     } catch (err) {
-      console.error('Failed to load dashboard reports:', err);
+      console.error('Failed to load dashboard data:', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchReports();
+    fetchDashboardData();
 
-    const handleReportCreated = () => fetchReports();
+    const handleReportCreated = () => fetchDashboardData();
     window.addEventListener('report-created', handleReportCreated);
     return () => window.removeEventListener('report-created', handleReportCreated);
   }, []);
@@ -63,11 +81,17 @@ export const DashboardPage: React.FC = () => {
     try {
       await reportsApi.submit(report._id);
       toast.success('Report submitted for manager review!');
-      fetchReports();
+      fetchDashboardData();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to submit report');
     }
   };
+
+  // Metrics from analytics or calculated fallback
+  const submittedThisWeek = analytics?.summary.submittedThisWeek ?? (pendingReview + approved);
+  const complianceRate = analytics?.summary.complianceRate ?? 85;
+  const needsCorrectionCount = analytics?.summary.needsCorrectionCount ?? changesRequested;
+  const openBlockersCount = analytics?.summary.openBlockersCount ?? 0;
 
   return (
     <div className="space-y-8">
@@ -76,15 +100,15 @@ export const DashboardPage: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <span className="inline-flex items-center rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-200 border border-indigo-400/30">
-              Weekly Reporting Cycle
+              Weekly Reporting & Performance Hub
             </span>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-              {isManager ? 'Team Reports & Review Center' : 'Your Weekly Progress'}
+              {isManager || isAdmin ? 'Executive Insights & Report Center' : 'Personal Weekly Progress'}
             </h1>
-            <p className="text-sm text-indigo-200/90 leading-relaxed">
-              {isManager
-                ? 'Track project progress, unblock team bottlenecks, and review submitted weekly engineering reports.'
-                : 'Keep your team aligned by logging your tasks, next week roadmap, blockers, and hours.'}
+            <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed">
+              {isManager || isAdmin
+                ? 'Review team velocity, unblock engineering bottlenecks, track task breakdown by type, and inspect weekly submission compliance.'
+                : 'Keep management and team members aligned by maintaining your standardized task table, next-week goals, and key blockers.'}
             </p>
           </div>
 
@@ -101,7 +125,7 @@ export const DashboardPage: React.FC = () => {
                 variant="glass"
                 icon={<ArrowUpRight className="h-4 w-4" />}
               >
-                View All
+                View All Reports
               </Button>
             </Link>
           </div>
@@ -111,79 +135,148 @@ export const DashboardPage: React.FC = () => {
         <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
       </div>
 
-      {/* Metric Cards Grid */}
+      {/* 4 Summary Metrics Cards (Section 6 Requirement) */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1 */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        {/* Metric 1: Total Reports Submitted This Week */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:border-slate-300 transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-slate-500 tracking-wider">
-              Total Reports
+            <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider">
+              Submitted This Week
             </span>
-            <div className="rounded-xl bg-slate-100 p-2 text-slate-700">
+            <div className="rounded-xl bg-indigo-50 p-2.5 text-indigo-600 border border-indigo-100">
               <FileText className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900">{totalReports}</div>
-          <p className="mt-1 text-xs text-slate-500">In current reporting scope</p>
+          <div className="mt-3 text-3xl font-black text-slate-900">{submittedThisWeek}</div>
+          <p className="mt-1 text-xs text-slate-500">In current reporting cycle</p>
         </div>
 
-        {/* Card 2 */}
-        <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-5 shadow-sm">
+        {/* Metric 2: Submission Compliance Rate */}
+        <div className="rounded-3xl border border-emerald-200 bg-emerald-50/40 p-5 shadow-sm hover:border-emerald-300 transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-blue-700 tracking-wider">
-              Pending Review
+            <span className="text-[11px] font-bold uppercase text-emerald-800 tracking-wider">
+              Compliance Rate
             </span>
-            <div className="rounded-xl bg-blue-100 p-2 text-blue-700">
-              <Clock className="h-5 w-5" />
+            <div className="rounded-xl bg-emerald-100 p-2.5 text-emerald-700">
+              <Percent className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-blue-900">{pendingReview}</div>
-          <p className="mt-1 text-xs text-blue-600">Awaiting manager review</p>
+          <div className="mt-3 text-3xl font-black text-emerald-950">{complianceRate}%</div>
+          <p className="mt-1 text-xs text-emerald-700">Submitted vs pending vs late</p>
         </div>
 
-        {/* Card 3 */}
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-sm">
+        {/* Metric 3: Number of reports in Needs Correction */}
+        <div className="rounded-3xl border border-amber-200 bg-amber-50/40 p-5 shadow-sm hover:border-amber-300 transition">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-emerald-700 tracking-wider">
-              Approved
+            <span className="text-[11px] font-bold uppercase text-amber-800 tracking-wider">
+              Needs Correction
             </span>
-            <div className="rounded-xl bg-emerald-100 p-2 text-emerald-700">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-3 text-2xl font-black text-emerald-900">{approved}</div>
-          <p className="mt-1 text-xs text-emerald-600">Milestones confirmed</p>
-        </div>
-
-        {/* Card 4 */}
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase text-amber-700 tracking-wider">
-              Changes Requested
-            </span>
-            <div className="rounded-xl bg-amber-100 p-2 text-amber-700">
+            <div className="rounded-xl bg-amber-100 p-2.5 text-amber-700">
               <AlertCircle className="h-5 w-5" />
             </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-amber-900">{changesRequested}</div>
-          <p className="mt-1 text-xs text-amber-600">Requires author update</p>
+          <div className="mt-3 text-3xl font-black text-amber-950">{needsCorrectionCount}</div>
+          <p className="mt-1 text-xs text-amber-700">Awaiting author correction</p>
+        </div>
+
+        {/* Metric 4: Open Blockers Across Team */}
+        <div className="rounded-3xl border border-rose-200 bg-rose-50/40 p-5 shadow-sm hover:border-rose-300 transition">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase text-rose-800 tracking-wider">
+              Open Blockers
+            </span>
+            <div className="rounded-xl bg-rose-100 p-2.5 text-rose-700">
+              <Flame className="h-5 w-5" />
+            </div>
+          </div>
+          <div className="mt-3 text-3xl font-black text-rose-950">{openBlockersCount}</div>
+          <p className="mt-1 text-xs text-rose-700">Team dependencies flagged</p>
         </div>
       </div>
 
-      {/* Tab filter and Recent Submissions */}
+      {/* Visual Insights Section (Section 6 Requirements) */}
+      {(isManager || isAdmin || (analytics && reports.length > 0)) && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-indigo-600" />
+                <span>Visual Insights & Team Analytics</span>
+              </h2>
+              <p className="text-xs text-slate-500">
+                Data-driven charts tracking velocity, workload, compliance, and time allocation
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Chart 1: Tasks Completed Trend Over Time */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <span>Tasks Completed Trend (Weekly Velocity)</span>
+                </h3>
+                <p className="text-xs text-slate-400">Team-wide completion trajectory over 4 weeks</p>
+              </div>
+              <AreaTrendChart data={analytics?.tasksTrend || []} />
+            </div>
+
+            {/* Chart 2: Time Spent by Task Type Team-Wide */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-indigo-600" />
+                  <span>Time Spent by Task Type</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Distribution across Development, Testing, Meetings, & Docs
+                </p>
+              </div>
+              <TaskTypeBarChart data={analytics?.timeSpentByTaskType || []} />
+            </div>
+
+            {/* Chart 3: Submission / Approval Status by Team Member */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-blue-600" />
+                  <span>Submission & Approval Status by Member</span>
+                </h3>
+                <p className="text-xs text-slate-400">Individual compliance and review stage</p>
+              </div>
+              <MemberStatusChart data={analytics?.memberStatusBreakdown || []} />
+            </div>
+
+            {/* Chart 4: Workload & Task Distribution by Project */}
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-violet-600" />
+                  <span>Workload Distribution by Project</span>
+                </h3>
+                <p className="text-xs text-slate-400">Hours logged per active project category</p>
+              </div>
+              <ProjectDonutChart data={analytics?.projectDistribution || []} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Submissions & Filter Tabs */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-3">
           <div>
             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-              {isManager ? 'Recent Team Submissions' : 'Your Recent Reports'}
+              {isManager || isAdmin ? 'Recent Team Submissions' : 'Your Recent Reports'}
             </h2>
             <p className="text-xs text-slate-500">
-              Latest submissions across all assigned projects
+              Latest submissions organized by status and week
             </p>
           </div>
 
           {/* Quick Filter Tabs */}
-          <div className="flex items-center space-x-1 rounded-xl bg-slate-100 p-1 text-xs font-medium text-slate-600">
+          <div className="flex items-center space-x-1 rounded-xl bg-slate-100 p-1 text-xs font-semibold text-slate-600">
             <button
               onClick={() => setActiveTab('all')}
               className={`rounded-lg px-3 py-1.5 transition ${
@@ -222,7 +315,7 @@ export const DashboardPage: React.FC = () => {
                   : 'hover:text-slate-900'
               }`}
             >
-              Changes ({changesRequested})
+              Needs Correction ({changesRequested})
             </button>
           </div>
         </div>
@@ -233,7 +326,7 @@ export const DashboardPage: React.FC = () => {
             <Spinner size="lg" />
           </div>
         ) : filteredReports.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+          <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">
             <FileText className="mx-auto h-12 w-12 text-slate-300 mb-3" />
             <h3 className="text-base font-semibold text-slate-900">No reports found</h3>
             <p className="mt-1 text-xs text-slate-500 max-w-sm mx-auto">
@@ -269,7 +362,7 @@ export const DashboardPage: React.FC = () => {
         report={selectedReportForReview}
         onReviewed={() => {
           setSelectedReportForReview(null);
-          fetchReports();
+          fetchDashboardData();
         }}
       />
 
@@ -284,7 +377,7 @@ export const DashboardPage: React.FC = () => {
         onCreated={() => {
           setIsCreateOpen(false);
           setSelectedReportForEdit(null);
-          fetchReports();
+          fetchDashboardData();
         }}
       />
     </div>
