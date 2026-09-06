@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReviewHistoryItem } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
+import { UserAvatar } from '../common/UserAvatar';
 import { MessageSquare, Calendar, User as UserIcon } from 'lucide-react';
 
 interface ReviewHistoryTimelineProps {
@@ -25,9 +26,6 @@ export const ReviewHistoryTimeline: React.FC<ReviewHistoryTimelineProps> = ({
         {history.map((item, idx) => {
           const isLast = idx === history.length - 1;
           const reviewerName = item.reviewer?.name || 'Reviewer';
-          const reviewerAvatar =
-            item.reviewer?.avatarUrl ||
-            `https://api.dicebear.com/7.x/avataaars/svg?seed=${reviewerName}`;
 
           return (
             <li key={item._id || idx}>
@@ -41,11 +39,7 @@ export const ReviewHistoryTimeline: React.FC<ReviewHistoryTimelineProps> = ({
                 <div className="relative flex items-start space-x-3">
                   {/* Reviewer Avatar */}
                   <div className="relative">
-                    <img
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 ring-4 ring-white border border-slate-200 object-cover"
-                      src={reviewerAvatar}
-                      alt={reviewerName}
-                    />
+                    <UserAvatar name={reviewerName} size="md" rounded="full" />
                   </div>
 
                   <div className="min-w-0 flex-1 rounded-xl bg-slate-50 p-4 border border-slate-200/80">

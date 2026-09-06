@@ -1,6 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, Plus, Bell } from 'lucide-react';
 import { Button } from '../common/Button';
+import { UserAvatar } from '../common/UserAvatar';
 import { useAuth } from '../../context/AuthContext';
 
 interface NavbarProps {
@@ -53,6 +55,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-indigo-600 ring-2 ring-white"></span>
           </button>
         </div>
+
+        {/* User Initial Avatar in Header */}
+        <Link
+          to="/profile"
+          className="flex items-center gap-2.5 p-1 rounded-full hover:ring-2 hover:ring-indigo-500/20 transition"
+          title={`Profile of ${user?.name}`}
+        >
+          <UserAvatar name={user?.name} size="sm" rounded="full" />
+        </Link>
       </div>
     </header>
   );
