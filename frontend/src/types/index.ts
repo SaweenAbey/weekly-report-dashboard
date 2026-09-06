@@ -10,6 +10,19 @@ export type ReportStatus =
 
 export type ProjectStatus = 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'ARCHIVED';
 
+export type ActivityAction =
+  | 'USER_REGISTER'
+  | 'USER_LOGIN'
+  | 'USER_LOGOUT'
+  | 'PASSWORD_CHANGED'
+  | 'REPORT_CREATED'
+  | 'REPORT_UPDATED'
+  | 'REPORT_SUBMITTED'
+  | 'REPORT_REVIEWED'
+  | 'REPORT_DELETED'
+  | 'PROJECT_CREATED'
+  | 'ROLE_UPDATED';
+
 export interface User {
   _id?: string;
   id?: string;
@@ -19,6 +32,7 @@ export interface User {
   avatarUrl?: string;
   department?: string;
   isActive?: boolean;
+  isApproved?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -62,6 +76,18 @@ export interface Report {
   status: ReportStatus;
   reviewHistory: ReviewHistoryItem[];
   latestComment?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ActivityLog {
+  _id: string;
+  user?: User;
+  action: ActivityAction;
+  description: string;
+  ip?: string;
+  userAgent?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }

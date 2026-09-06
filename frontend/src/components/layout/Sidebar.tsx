@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
@@ -8,8 +9,12 @@ import {
   Users,
   LogOut,
   Sparkles,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { RoleBadge } from '../common/StatusBadge';
+import { Modal } from '../common/Modal';
+import { Button } from '../common/Button';
 
 export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
   isOpen,
@@ -17,10 +22,19 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 }) => {
   const { user, logout, isManager, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      setShowLogoutModal(false);
+      navigate('/login');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   const navItems = [
@@ -46,8 +60,18 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
             label: 'Team Members',
             icon: <Users className="w-5 h-5" />,
           },
+          {
+            to: '/logs',
+            label: 'Audit & Activity Logs',
+            icon: <ShieldCheck className="w-5 h-5" />,
+          },
         ]
       : []),
+    {
+      to: '/profile',
+      label: 'Profile & Security',
+      icon: <UserCheck className="w-5 h-5" />,
+    },
   ];
 
   return (
@@ -107,7 +131,11 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
         {/* User Profile & Logout Bottom Bar */}
         <div className="border-t border-slate-800 p-4 bg-slate-950/40">
-          <div className="flex items-center justify-between mb-3">
+          <NavLink
+            to="/profile"
+            onClick={onClose}
+            className="flex items-center justify-between mb-3 hover:bg-slate-900/60 p-1.5 rounded-xl transition cursor-pointer"
+          >
             <div className="flex items-center space-x-3 min-w-0">
               <img
                 src={
@@ -126,13 +154,13 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                 </div>
               </div>
             </div>
-          </div>
+          </NavLink>
 
           <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
             {user?.role && <RoleBadge role={user.role} />}
             <button
-              onClick={handleLogout}
-              className="flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-rose-400 transition"
+              onClick={() => setShowLogoutModal(true)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-rose-400 transition"
               title="Log out"
             >
               <LogOut className="h-4 w-4" />
@@ -141,6 +169,40 @@ export const Sidebar: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
           </div>
         </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        title="Confirm Sign Out"
+        description="Are you sure you want to end your current session?"
+        maxWidth="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-xs text-slate-600">
+            You will need to sign in again with your credentials to access your weekly reports and dashboard.
+          </p>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLogoutModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              isLoading={isLoggingOut}
+              onClick={confirmLogout}
+              icon={<LogOut className="h-3.5 w-3.5" />}
+            >
+              Confirm Logout
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

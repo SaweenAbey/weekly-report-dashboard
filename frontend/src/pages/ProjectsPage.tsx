@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { projectsApi } from '../api/projects.api';
 import { usersApi } from '../api/users.api';
 import { Project, User } from '../types';
@@ -71,6 +72,7 @@ export const ProjectsPage: React.FC = () => {
         endDate: endDate || undefined,
       });
 
+      toast.success('Project created successfully!');
       setIsCreateModalOpen(false);
       setName('');
       setKey('');
@@ -78,9 +80,9 @@ export const ProjectsPage: React.FC = () => {
       setSelectedMembers([]);
       fetchProjects();
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Failed to create project. Please check fields.',
-      );
+      const msg = err.response?.data?.message || 'Failed to create project. Please check fields.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

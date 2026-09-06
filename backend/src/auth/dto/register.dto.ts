@@ -1,6 +1,6 @@
 import {
   IsEmail,
-  IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -22,8 +22,10 @@ export class RegisterDto {
   password: string;
 
   @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
+  @IsIn([Role.TEAM_MEMBER, Role.MANAGER], {
+    message: 'Self-registration is only permitted for Team Member or Manager roles.',
+  })
+  role?: Role = Role.TEAM_MEMBER;
 
   @IsOptional()
   @IsString()

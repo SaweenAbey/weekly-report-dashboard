@@ -48,6 +48,18 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @Patch(':id/approve')
+  @Roles(Role.ADMIN)
+  approve(@Param('id') id: string) {
+    return this.usersService.approveUser(id, true);
+  }
+
+  @Patch(':id/toggle-active')
+  @Roles(Role.ADMIN)
+  toggleActive(@Param('id') id: string) {
+    return this.usersService.toggleActive(id);
+  }
+
   @Delete(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)

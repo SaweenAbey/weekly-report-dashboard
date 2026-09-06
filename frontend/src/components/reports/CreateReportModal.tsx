@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
+import toast from 'react-hot-toast';
 import { projectsApi } from '../../api/projects.api';
 import { reportsApi } from '../../api/reports.api';
 import { Project, Report } from '../../types';
@@ -115,7 +116,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!projectId || !weekStartDate || !weekEndDate || !summary.trim()) {
-      setError('Please fill in all required fields (Project, Dates, Summary).');
+      const msg = 'Please fill in all required fields (Project, Dates, Summary).';
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -138,15 +141,17 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
       let saved: Report;
       if (initialReport) {
         saved = await reportsApi.update(initialReport._id, payload);
+        toast.success('Weekly report updated successfully!');
       } else {
         saved = await reportsApi.create(payload);
+        toast.success('Weekly report created as draft!');
       }
       onCreated(saved);
       onClose();
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 'Failed to save weekly report. Please try again.',
-      );
+      const msg = err.response?.data?.message || 'Failed to save report.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

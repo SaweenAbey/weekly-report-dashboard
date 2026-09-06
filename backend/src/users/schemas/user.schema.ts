@@ -34,6 +34,9 @@ export class User {
 
   @Prop({ default: true })
   isActive: boolean;
+
+  @Prop({ default: false })
+  isApproved: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -32,4 +32,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   avatarUrl?: string;
+
+  @IsOptional()
+  isApproved?: boolean;
 }

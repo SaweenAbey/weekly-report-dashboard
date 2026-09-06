@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import { reportsApi } from '../api/reports.api';
 import { Report } from '../types';
@@ -61,9 +62,10 @@ export const DashboardPage: React.FC = () => {
   const handleSubmitReport = async (report: Report) => {
     try {
       await reportsApi.submit(report._id);
+      toast.success('Report submitted for manager review!');
       fetchReports();
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to submit report');
     }
   };
 
@@ -86,18 +88,17 @@ export const DashboardPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={() => setIsCreateOpen(true)}
-              className="bg-white text-indigo-900 hover:bg-indigo-50 shadow-none font-bold"
+              variant="white"
               icon={<Plus className="h-4 w-4 text-indigo-700" />}
             >
               New Weekly Report
             </Button>
             <Link to="/reports">
               <Button
-                variant="outline"
-                className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                variant="glass"
                 icon={<ArrowUpRight className="h-4 w-4" />}
               >
                 View All
