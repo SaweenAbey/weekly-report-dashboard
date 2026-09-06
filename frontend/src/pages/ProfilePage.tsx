@@ -6,6 +6,7 @@ import { ActivityLog } from '../types';
 import { RoleBadge } from '../components/common/StatusBadge';
 import { Button } from '../components/common/Button';
 import { Spinner } from '../components/common/Modal';
+import { UserAvatar } from '../components/common/UserAvatar';
 import {
   Mail,
   Building,
@@ -115,14 +116,7 @@ export const ProfilePage: React.FC = () => {
       <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
-            <img
-              src={
-                user?.avatarUrl ||
-                `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'User'}`
-              }
-              alt={user?.name}
-              className="h-16 w-16 rounded-2xl bg-slate-100 border border-slate-200 object-cover shadow-sm"
-            />
+            <UserAvatar name={user?.name} size="xl" />
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-slate-900">{user?.name}</h2>

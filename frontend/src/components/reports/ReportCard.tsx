@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Report } from '../../types';
 import { StatusBadge } from '../common/StatusBadge';
 import { Button } from '../common/Button';
+import { UserAvatar } from '../common/UserAvatar';
 import { useAuth } from '../../context/AuthContext';
 import {
   Calendar,
@@ -48,9 +49,6 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     typeof report.project === 'object' ? report.project.key : 'PRJ';
 
   const authorName = report.author?.name || 'Unknown Author';
-  const authorAvatar =
-    report.author?.avatarUrl ||
-    `https://api.dicebear.com/7.x/avataaars/svg?seed=${authorName}`;
 
   const startDateFormatted = new Date(report.weekStartDate).toLocaleDateString([], {
     month: 'short',
@@ -67,11 +65,7 @@ export const ReportCard: React.FC<ReportCardProps> = ({
       {/* Top row: Author, Project, Status */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
         <div className="flex items-center space-x-3">
-          <img
-            src={authorAvatar}
-            alt={authorName}
-            className="h-9 w-9 rounded-full bg-slate-100 border border-slate-200 object-cover"
-          />
+          <UserAvatar name={authorName} size="sm" rounded="full" />
           <div>
             <div className="text-sm font-semibold text-slate-900 leading-tight">
               {authorName}
