@@ -10,8 +10,11 @@ import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ReportDetailsPage } from './pages/ReportDetailsPage';
+import { PersonalReportPage } from './pages/PersonalReportPage';
+import { MyReportsHistoryPage } from './pages/MyReportsHistoryPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { TeamPage } from './pages/TeamPage';
+import { MemberProfilePage } from './pages/MemberProfilePage';
 import { ProfilePage } from './pages/ProfilePage';
 import { ActivityLogsPage } from './pages/ActivityLogsPage';
 
@@ -63,7 +66,10 @@ export const App: React.FC = () => {
           >
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reports/new" element={<PersonalReportPage />} />
             <Route path="/reports/:id" element={<ReportDetailsPage />} />
+            <Route path="/reports/:id/edit" element={<PersonalReportPage />} />
+            <Route path="/my-reports" element={<MyReportsHistoryPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route
@@ -71,6 +77,14 @@ export const App: React.FC = () => {
               element={
                 <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
                   <TeamPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/team/:id"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+                  <MemberProfilePage />
                 </ProtectedRoute>
               }
             />

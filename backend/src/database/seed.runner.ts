@@ -5,6 +5,7 @@ import { DatabaseModule } from './database.module';
 import { UsersModule } from '../users/users.module';
 import { ProjectsModule } from '../projects/projects.module';
 import { ReportsModule } from '../reports/reports.module';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 import { SeedService } from './seed.service';
 
 @Module({
@@ -14,6 +15,7 @@ import { SeedService } from './seed.service';
     UsersModule,
     ProjectsModule,
     ReportsModule,
+    ActivityLogsModule,
   ],
   providers: [SeedService],
 })
