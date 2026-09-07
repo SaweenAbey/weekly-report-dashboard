@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ReportsModule } from './reports/reports.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+import { AiModule } from './ai/ai.module';
 import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware';
 
 @Module({
@@ -20,6 +21,7 @@ import { HttpLoggerMiddleware } from './common/middleware/http-logger.middleware
     UsersModule,
     ProjectsModule,
     ReportsModule,
+    AiModule,
   ],
 })
 export class AppModule implements NestModule {
