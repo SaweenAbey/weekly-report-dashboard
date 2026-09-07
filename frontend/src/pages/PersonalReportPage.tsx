@@ -103,7 +103,7 @@ export const PersonalReportPage: React.FC = () => {
         .getById(id)
         .then((report) => {
           setProjectId(
-            typeof report.project === 'object' ? report.project._id : report.project,
+            typeof report.project === 'object' && report.project ? report.project._id : (report.project || ''),
           );
           setWeekStartDate(report.weekStartDate.split('T')[0]);
           setWeekEndDate(report.weekEndDate.split('T')[0]);
