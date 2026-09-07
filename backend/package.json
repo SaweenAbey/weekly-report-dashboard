@@ -6,14 +6,15 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "node init && nest build",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start": "node init && nest start",
+    "start:dev": "node init && nest start --watch",
+    "start:debug": "node init && nest start --debug --watch",
+    "start:prod": "node init && node dist/main",
     "seed": "ts-node -r tsconfig-paths/register src/database/seed.runner.ts",
-    "test:rbac": "ts-node -r tsconfig-paths/register src/auth/guards/rbac.test.ts"
+    "test:rbac": "ts-node -r tsconfig-paths/register src/auth/guards/rbac.test.ts",
+    "test:ai": "ts-node -r tsconfig-paths/register src/ai/ai.test.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.0",

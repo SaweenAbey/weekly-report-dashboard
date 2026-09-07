@@ -61,7 +61,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Review Weekly Report"
-      description={`Reviewing report for ${report.author?.name} (${typeof report.project === 'object' ? report.project.name : 'Project'})`}
+      description={`Reviewing report for ${report.author?.name || 'Author'} (${typeof report.project === 'object' && report.project ? report.project.name : 'Project'})`}
       maxWidth="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-5">
