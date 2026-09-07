@@ -65,7 +65,7 @@ export const RegisterPage: React.FC = () => {
 
       toast.success(
         res.message ||
-          'Account created! Awaiting admin approval before you can log in.',
+        'Account created! Awaiting admin approval before you can log in.',
         { duration: 6000 },
       );
       setIsSuccessPending(true);
@@ -212,19 +212,16 @@ export const RegisterPage: React.FC = () => {
               <div className="mt-1.5 flex items-center gap-2 text-xs">
                 <div className="flex-1 h-1.5 bg-slate-200 rounded-full overflow-hidden flex gap-1">
                   <div
-                    className={`h-full flex-1 ${
-                      strength.level >= 1 ? strength.color : ''
-                    }`}
+                    className={`h-full flex-1 ${strength.level >= 1 ? strength.color : ''
+                      }`}
                   ></div>
                   <div
-                    className={`h-full flex-1 ${
-                      strength.level >= 2 ? strength.color : ''
-                    }`}
+                    className={`h-full flex-1 ${strength.level >= 2 ? strength.color : ''
+                      }`}
                   ></div>
                   <div
-                    className={`h-full flex-1 ${
-                      strength.level >= 3 ? strength.color : ''
-                    }`}
+                    className={`h-full flex-1 ${strength.level >= 3 ? strength.color : ''
+                      }`}
                   ></div>
                 </div>
                 <span className="font-semibold text-[11px] text-slate-600">
