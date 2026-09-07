@@ -103,9 +103,13 @@ export const ReportDetailsPage: React.FC = () => {
     (isAuthor && report.status === 'DRAFT') || isAdmin;
 
   const projectName =
-    typeof report.project === 'object' ? report.project.name : 'Project';
+    typeof report.project === 'object' && report.project
+      ? report.project.name || 'Project'
+      : 'Project';
   const projectKey =
-    typeof report.project === 'object' ? report.project.key : 'PRJ';
+    typeof report.project === 'object' && report.project
+      ? report.project.key || 'PRJ'
+      : 'PRJ';
 
   const authorName = report.author?.name || 'Unknown Author';
 

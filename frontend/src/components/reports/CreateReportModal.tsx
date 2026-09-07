@@ -141,9 +141,9 @@ export const CreateReportModal: React.FC<CreateReportModalProps> = ({
         setNotesOrLinks('');
       } else {
         setProjectId(
-          typeof initialReport.project === 'object'
+          typeof initialReport.project === 'object' && initialReport.project
             ? initialReport.project._id
-            : initialReport.project,
+            : (initialReport.project || ''),
         );
         setWeekStartDate(initialReport.weekStartDate.split('T')[0]);
         setWeekEndDate(initialReport.weekEndDate.split('T')[0]);

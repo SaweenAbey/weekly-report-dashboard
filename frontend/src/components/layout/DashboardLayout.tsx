@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { CreateReportModal } from '../reports/CreateReportModal';
+import { ChatAssistantWidget } from '../chat/ChatAssistantWidget';
 
 export const DashboardLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,6 +38,9 @@ export const DashboardLayout: React.FC = () => {
           window.dispatchEvent(new CustomEvent('report-created'));
         }}
       />
+
+      {/* Floating AI Chat Assistant Widget */}
+      <ChatAssistantWidget />
     </div>
   );
 };

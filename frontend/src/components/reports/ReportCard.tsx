@@ -44,9 +44,13 @@ export const ReportCard: React.FC<ReportCardProps> = ({
     (report.status === 'SUBMITTED' || report.status === 'UNDER_REVIEW');
 
   const projectName =
-    typeof report.project === 'object' ? report.project.name : 'Project';
+    typeof report.project === 'object' && report.project
+      ? report.project.name || 'Project'
+      : 'Project';
   const projectKey =
-    typeof report.project === 'object' ? report.project.key : 'PRJ';
+    typeof report.project === 'object' && report.project
+      ? report.project.key || 'PRJ'
+      : 'PRJ';
 
   const authorName = report.author?.name || 'Unknown Author';
 
